@@ -15,6 +15,9 @@ function Editor({
     const inputRef = useRef<HTMLInputElement>(null)
     const [isEdit, setEdit] = useState(id ? false : true);
 
+    /* Save previous value before user starts editing */
+    const inputPrevValue = useRef(value)
+
     const handleInput: React.ChangeEventHandler<HTMLInputElement> = (e) => {
         setValue(e.target.value);
     };
@@ -27,18 +30,20 @@ function Editor({
 
     const update = (type?: ActionTypes) => {
         /**
-         * In case of commited comment, but non ieditable, simply make the edit enable
+         * In case of commited comment, but non ieditable, simply make the edit enable. Store the current value in the ref
          */
         if (type === ActionTypes.UPDATE && !isEdit) {
             setEdit(true)
+            inputPrevValue.current = value
             return
         }
 
         /**
-         * Incase of the edit is enabled, pressing cancel should disable the edit mode
+         * Incase of the edit is enabled, pressing cancel should disable the edit mode. Retore the saved value in case of cancel
          */
         if (type === ActionTypes.DELETE && isEdit) {
             setEdit(false)
+            setValue(inputPrevValue.current)
             return
         }
 

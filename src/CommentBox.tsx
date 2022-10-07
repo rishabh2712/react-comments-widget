@@ -46,6 +46,7 @@ function CommentBox({
   return (
     <div className="relative">
       <Editor
+        disableReply={disableReply}
         initiateReply={initiateReply}
         mutate={mutate}
         id={id}

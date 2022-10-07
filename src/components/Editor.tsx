@@ -8,6 +8,7 @@ function Editor({
     id,
     initiateReply,
     mutate,
+    disableReply
 }) {
     const { store } = useCommentsStore()
     const isCommited = typeof id !== "undefined"
@@ -29,6 +30,7 @@ function Editor({
     }, [isEdit])
 
     const update = (type?: ActionTypes) => {
+
         /**
          * In case of commited comment, but non ieditable, simply make the edit enable. Store the current value in the ref
          */
@@ -39,11 +41,18 @@ function Editor({
         }
 
         /**
+         * Fired in case of cancel.
          * Incase of the edit is enabled, pressing cancel should disable the edit mode. Retore the saved value in case of cancel
          */
         if (type === ActionTypes.DELETE && isEdit) {
             setEdit(false)
             setValue(inputPrevValue.current)
+            /**
+             * Incase if the edit is enabled, and user havent entered the value, press cancel should disable the edit mode.
+             */
+            if (!inputPrevValue.current?.length) {
+                disableReply?.()
+            }
             return
         }
 
@@ -82,6 +91,8 @@ function Editor({
             ) : (
                 <span>{value}</span>
             )}
+
+            {/* TODO: Simplify this conditional hell */}
             <div className="flex gap-x-0.5 mt-2">
                 {!isEdit && <Button onClick={initiateReply}><i className="fa fa-reply mr-2" aria-hidden="true"></i>Reply</Button>}
                 <Button className="mr-2" onClick={() => update(isCommited ? ActionTypes.UPDATE : ActionTypes.ADD)}>{isEdit ? "Save" : "Edit"}</Button>
